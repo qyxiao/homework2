@@ -1,4 +1,4 @@
-/* GS smoothing to solve -u''=f
+/* Jacobi smoothing to solve -u''=f
  * Global vector has N inner unknowns.
  * Author: Georg Stadler
  */
@@ -10,16 +10,17 @@
 #include <omp.h>
 #endif
 
-
 /* compuate global residual, assuming ghost values are updated */
-double compute_residual(double *u, int N, double invhsq)
+double compute_residual_2d(double *u, int N, double invhsq)
 {
-  int i;
-  double res = 0.0;
-# pragma omp parallel for default(none) shared (N,u,invhsq) reduction(+:res)
+  int i,j;
+  double tmp, res = 0.0;
+#pragma omp parallel for default(none) shared(u,N,invhsq) private(i,j,tmp) reduction(+:res) collapse(2)
   for (i = 1; i <= N; i++){
-    double tmp = ((2.0*u[i] - u[i-1] - u[i+1]) * invhsq - 1);
+    for(j=1;j<=N;j++){
+    tmp = ((4.0*u[i*(N+2)+j] - u[(i-1)*(N+2)+j] - u[(i+1)*(N+2)+j]-u[i*(N+2)+j-1]-u[i*(N+2)+j+1]) * invhsq - 1);
     res += tmp * tmp;
+    }
   }
   return sqrt(res);
 }
@@ -27,29 +28,30 @@ double compute_residual(double *u, int N, double invhsq)
 
 int main(int argc, char * argv[])
 {
-  int i, N, iter, max_iters;
+  int i, j, N, iter, max_iters;
 
   sscanf(argv[1], "%d", &N);
   sscanf(argv[2], "%d", &max_iters);
-
-#ifdef _OPENMP
-#pragma omp parallel
+# pragma omp parallel
   {
-    int my_threadNum = omp_get_thread_num();
-    int numThreads = omp_get_num_threads();
-    printf("Hello from thread %d of %d\n",my_threadNum, numThreads);
-  }
+#ifdef _OPENMP
+    int my_threadnum = omp_get_thread_num();
+    int numthreads = omp_get_num_threads();
 #else
-  printf("Hello from process %d of %d\n",0, 1);
+    int my_threadnum = 0;
+    int numthreads = 1;
 #endif
+    printf("Hello, I'm thread %d out of %d\n", my_threadnum, numthreads);
+  }
 
-  
   /* timing */
   timestamp_type time1, time2;
   get_timestamp(&time1);
-
+  
+  
   /* Allocation of vectors, including left and right ghost points */
-  double * u    = (double *) calloc(sizeof(double), N+2);
+  double * u    = (double *) calloc(sizeof(double), (N+2)*(N+2));
+  
 
   double h = 1.0 / (N + 1);
   double hsq = h * h;
@@ -57,20 +59,44 @@ int main(int argc, char * argv[])
   double res, res0, tol = 1e-5;
 
   /* initial residual */
-  res0 = compute_residual(u, N, invhsq);
+  res0 = compute_residual_2d(u, N, invhsq);
   res = res0;
-  u[0] = u[N+1] = 0.0;
+
+  #pragma omp parallel for default(none) shared(N,u) 
+  for (i = 0; i <= N+1; i++){
+      u[i]=0;
+      u[i*(N+2)]=0;
+      u[i*(N+2)+N+1]=0;
+      u[i+(N+1)*(N+2)]=0;
+  }
+
 
   for (iter = 0; iter < max_iters && res/res0 > tol; iter++) {
 
-# pragma omp parallel for default(none) shared (hsq,N,u,invhsq)
-    /* Gauss-Seidel step for all the inner points */
+#pragma omp parallel for default(none) shared(N,u,hsq) private(i,j)  collapse(2)
+    /* Jacobi step for all the inner points */
     for (i = 1; i <= N; i++){
-      u[i]  = 0.5 * (hsq + u[i - 1] + u[i + 1]);
+      for(j=1;j<=N;j++){
+        if((i+j)%2==0){
+          u[i*(N+2)+j] = 0.25 * (hsq + u[(i-1)*(N+2)+j] + u[(i+1)*(N+2)+j] + u[i*(N+2)+j-1] + u[i*(N+2)+j+1]);
+        }
+      }
     }
 
+#pragma omp parallel for default(none) shared(N,u,hsq) private(i,j)  collapse(2)
+    /* Jacobi step for all the inner points */
+    for (i = 1; i <= N; i++){
+      for(j=1;j<=N;j++){
+        if((i+j)%2!=0){
+          u[i*(N+2)+j] = 0.25 * (hsq + u[(i-1)*(N+2)+j] + u[(i+1)*(N+2)+j] + u[i*(N+2)+j-1] + u[i*(N+2)+j+1]);
+        }
+      }
+    }
+
+
+    //    memcpy(u, unew, (N+2)*sizeof(double));
     if (0 == (iter % 10)) {
-      res = compute_residual(u, N, invhsq);
+      res = compute_residual_2d(u, N, invhsq);
       printf("Iter %d: Residual: %g\n", iter, res);
     }
   }
