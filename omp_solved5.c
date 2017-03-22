@@ -1,7 +1,7 @@
 /******************************************************************************
 * FILE: omp_solved5.c
 * DESCRIPTION:
-*   Instead, using locks to let addition happens in one array first, then assign 
+*   Nested locks cause deadlock. Instead, using locks to let addition happens in one array first, then assign 
 *   the result to the other array to eliminate conflicts. 
 ******************************************************************************/
 #include <omp.h>

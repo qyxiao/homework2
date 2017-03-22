@@ -1,6 +1,7 @@
 /******************************************************************************
 * FILE: omp_solved6.c
 * DESCRIPTION:
+*   'sum' is shared before entering 'drop()' but then tries to become private.
 *   Declare 'sum' to be private before entering the function drop() to insure consistency.
 ******************************************************************************/
 #include <omp.h>

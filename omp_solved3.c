@@ -3,7 +3,7 @@
 * DESCRIPTION:
 *   'Section' directive makes function 'print_results' only run by one thread, thus  
 * the 'Barrier' directive at the end of 'print_results' function will never be able to synchronize
-* all the threads.
+* all the threads. Delete this 'Barrier' directive and add the 'print' statement to the critical section.
 ******************************************************************************/
 #include <omp.h>
 #include <stdio.h>
