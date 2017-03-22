@@ -1,9 +1,8 @@
 /******************************************************************************
-* FILE: omp_bug2.c
+* FILE: omp_solved2.c
 * DESCRIPTION:
-*   Another OpenMP program with a bug. 
-* AUTHOR: Blaise Barney 
-* LAST REVISED: 04/06/05 
+*   The variable 'total' is shared in the parallel region. Changing it to 
+* reduction or private can solve the problem.
 ******************************************************************************/
 #include <omp.h>
 #include <stdio.h>

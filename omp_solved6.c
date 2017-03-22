@@ -1,10 +1,7 @@
 /******************************************************************************
-* FILE: omp_bug6.c
+* FILE: omp_solved6.c
 * DESCRIPTION:
-*   This program compiles and runs fine, but produces the wrong result.
-*   Compare to omp_orphan.c.
-* AUTHOR: Blaise Barney  6/05
-* LAST REVISED: 06/30/05
+*   Declare 'sum' to be private before entering the function drop() to insure consistency.
 ******************************************************************************/
 #include <omp.h>
 #include <stdio.h>

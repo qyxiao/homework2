@@ -1,10 +1,8 @@
 /******************************************************************************
-* FILE: omp_bug5.c
+* FILE: omp_solved5.c
 * DESCRIPTION:
-*   Using SECTIONS, two threads initialize their own array and then add
-*   it to the other's array, however a deadlock occurs.
-* AUTHOR: Blaise Barney  01/29/04
-* LAST REVISED: 04/06/05
+*   Instead, using locks to let addition happens in one array first, then assign 
+*   the result to the other array to eliminate conflicts. 
 ******************************************************************************/
 #include <omp.h>
 #include <stdio.h>

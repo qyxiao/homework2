@@ -1,9 +1,9 @@
 /******************************************************************************
-* FILE: omp_bug3.c
+* FILE: omp_solved3.c
 * DESCRIPTION:
-*   Run time error
-* AUTHOR: Blaise Barney  01/09/04
-* LAST REVISED: 06/28/05
+*   'Section' directive makes function 'print_results' only run by one thread, thus  
+* the 'Barrier' directive at the end of 'print_results' function will never be able to synchronize
+* all the threads.
 ******************************************************************************/
 #include <omp.h>
 #include <stdio.h>

@@ -1,9 +1,8 @@
 /******************************************************************************
-* FILE: omp_bug4.c
+* FILE: omp_solved4.c
 * DESCRIPTION:
-*   This very simple program causes a segmentation fault.
-* AUTHOR: Blaise Barney  01/09/04
-* LAST REVISED: 04/06/05
+*   Fixed size array may cause stack size exceed error. Allocate the array inside
+* the parrallel  region dynamically can solve this problem.
 ******************************************************************************/
 #include <omp.h>
 #include <stdio.h>
