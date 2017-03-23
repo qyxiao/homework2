@@ -30,6 +30,11 @@ double compute_residual_2d(double *u, int N, double invhsq)
 int main(int argc, char * argv[])
 {
   int i, j, N, iter, max_iters;
+  
+  if (argc != 3) {
+    fprintf(stderr, "Function needs two input arguments!\n");
+    abort();
+  }
 
   sscanf(argv[1], "%d", &N);
   sscanf(argv[2], "%d", &max_iters);
