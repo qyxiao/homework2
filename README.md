@@ -14,6 +14,7 @@ bug_solved6: 'sum' is shared before entering 'drop()' but then tries to become p
 
 
 
+Parellel experienment below run with 4 threads.
 
 | Array Length(N) / Max Iter  | jacobi2D | jacobi2D-omp | gs2D | gs2D-omp | Last Residual |
 | --- | --- | --- | --- | --- | --- | 
