@@ -1,6 +1,6 @@
 CC=gcc 
 FLAGS= -fopenmp  -lm
-EXECS= bug2 bug3 bug4 bug5 bug6 jacobi-omp GS-omp
+EXECS= bug2 bug3 bug4 bug5 bug6 jacobi-omp GS-omp jacobi GS
 
 all: ${EXECS}
 
@@ -23,14 +23,14 @@ bug6: omp_solved6.c
 jacobi-omp: jacobi2D-omp.c
 	${CC} ${FLAGS} $^ -o jacobi2D-omp
 
-jacobi-omp: jacobi2D-omp.c
+jacobi: jacobi2D-omp.c
 	${CC} -lm -lrt $^ -o jacobi2D
 
 
 GS-omp: gs2D-omp.c
 	${CC} ${FLAGS} $^ -o gs2D-omp
 
-GS-omp: gs2D-omp.c
+GS: gs2D-omp.c
 	${CC} -lm -lrt $^ -o gs2D
 
 clean:
